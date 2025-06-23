@@ -1,7 +1,6 @@
-# Usa a imagem base do PHP-FPM
 FROM php:8.2-fpm
 
-# Instala dependências do sistema + Nginx
+# Instala dependências + Nginx e Supervisor
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpng-dev \
@@ -18,37 +17,15 @@ RUN apt-get update && apt-get install -y \
     nginx \
     supervisor
 
-# Instala extensões do PHP
-RUN docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip
+# Configura Supervisor
+RUN mkdir -p /var/log/supervisor /etc/supervisor/conf.d
 
-# Configura o Nginx
+# ... (restante das suas configurações PHP, Composer, etc)
+
+# Copia configurações
 COPY docker/nginx.conf /etc/nginx/sites-available/default
-RUN ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
-
-# Configura o Supervisor (para gerenciar Nginx e PHP-FPM)
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Instala o Composer
-COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
-
-# Diretório de trabalho
-WORKDIR /var/www
-
-# Copia o projeto Laravel
-COPY . .
-
-# Instala dependências do Laravel (sem dev-dependencies)
-RUN composer install --optimize-autoloader --no-dev
-
-# Permissões
-RUN chown -R www-data:www-data /var/www \
-    && chmod -R 755 /var/www/storage
-
-# Gera chave da aplicação (se não existir)
-RUN if [ ! -f .env ]; then cp .env.example .env && php artisan key:generate; fi
-
-# Expõe a porta 8000 (Nginx)
 EXPOSE 8000
 
-# Inicia o Supervisor (que gerencia Nginx e PHP-FPM)
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

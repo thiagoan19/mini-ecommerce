@@ -15,13 +15,6 @@ Projeto fullstack de um mini-e-commerce com **Laravel (API REST)** no back-end e
 
 ---
 
-## 🚀 Demonstração
-
-- Front-end: https://mini-ecommerce.vercel.app
-- Back-end: https://mini-ecommerce-api.onrender.com
-
----
-
 ## ⚙️ Como rodar localmente
 
 ### Pré-requisitos
