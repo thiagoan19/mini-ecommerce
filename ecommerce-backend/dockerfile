@@ -1,7 +1,7 @@
-# Dockerfile (coloque dentro de ecommerce-backend/)
+# Usa a imagem base do PHP-FPM
 FROM php:8.2-fpm
 
-# Instala dependências do sistema
+# Instala dependências do sistema + Nginx
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpng-dev \
@@ -14,32 +14,41 @@ RUN apt-get update && apt-get install -y \
     curl \
     git \
     libzip-dev \
-    default-mysql-client
+    default-mysql-client \
+    nginx \
+    supervisor
 
 # Instala extensões do PHP
 RUN docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip
 
-# Instala Composer
+# Configura o Nginx
+COPY docker/nginx.conf /etc/nginx/sites-available/default
+RUN ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+
+# Configura o Supervisor (para gerenciar Nginx e PHP-FPM)
+COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Instala o Composer
 COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
 
-# Cria diretório de trabalho
+# Diretório de trabalho
 WORKDIR /var/www
 
 # Copia o projeto Laravel
 COPY . .
 
-# Instala dependências do Laravel
+# Instala dependências do Laravel (sem dev-dependencies)
 RUN composer install --optimize-autoloader --no-dev
 
 # Permissões
 RUN chown -R www-data:www-data /var/www \
     && chmod -R 755 /var/www/storage
 
-# Gera chave da aplicação
-RUN php artisan config:clear && php artisan key:generate
+# Gera chave da aplicação (se não existir)
+RUN if [ ! -f .env ]; then cp .env.example .env && php artisan key:generate; fi
 
-# Expõe a porta que o Laravel usará
+# Expõe a porta 8000 (Nginx)
 EXPOSE 8000
 
-# Comando de inicialização
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+# Inicia o Supervisor (que gerencia Nginx e PHP-FPM)
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
