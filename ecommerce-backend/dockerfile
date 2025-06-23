@@ -26,6 +26,6 @@ RUN mkdir -p /var/log/supervisor /etc/supervisor/conf.d
 COPY docker/nginx.conf /etc/nginx/sites-available/default
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-EXPOSE 8000
+EXPOSE 8080
 
 CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
