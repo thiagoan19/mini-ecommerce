@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: ecommerce-backend
+    env: docker
+    plan: free
+    repo: https://github.com/thiagoan19/mini-ecommerce
+    dockerfilePath: ecommerce-backend/Dockerfile
+    buildCommand: ""
+    startCommand: ""
+    autoDeploy: true
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: base64:qrxQGfnJi6cU6pg6xrO3cDugYE9UGLeJQrbRCZUH+ys=
+        generateValue: true
+      - key: DB_CONNECTION
+        value: mysql
+      - key: DB_HOST
+        value: sql102.infinityfree.com
+      - key: DB_PORT
+        value: 3306
+      - key: DB_DATABASE
+        value: if0_39299806_miniecommerce
+      - key: DB_USERNAME
+        value: if0_39299806
+      - key: DB_PASSWORD
+        value: Q81lCLm2yQ
