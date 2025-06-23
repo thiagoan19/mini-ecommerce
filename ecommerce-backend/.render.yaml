@@ -16,12 +16,12 @@ services:
       - key: DB_CONNECTION
         value: mysql
       - key: DB_HOST
-        value: sql102.infinityfree.com
+        value: mysql://root:qAxcKeMOWNjhQUaYUxROimsMngNrxwQh@mainline.proxy.rlwy.net:53094/railway
       - key: DB_PORT
         value: 3306
       - key: DB_DATABASE
-        value: if0_39299806_miniecommerce
+        value: railway
       - key: DB_USERNAME
-        value: if0_39299806
+        value: root
       - key: DB_PASSWORD
-        value: Q81lCLm2yQ
+        value: qAxcKeMOWNjhQUaYUxROimsMngNrxwQh
